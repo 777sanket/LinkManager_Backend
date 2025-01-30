@@ -5,6 +5,7 @@ const Analysis = require("../models/analysis.schema");
 const authMiddleware = require("../middleware/auth"); // For user authentication
 const getUserDeviceInfo = require("../utils/getDevice");
 const getLinkStatus = require("../utils/getLinkStatus");
+const e = require("express");
 const router = express.Router();
 
 // /**
@@ -34,7 +35,17 @@ router.post("/create", authMiddleware, async (req, res) => {
     }
 
     // Generate a unique shortened link
-    const shortenedLink = `${req.headers.host}/${shortid.generate()}`;
+    const hostLink = `${req.headers.host}`;
+    function extractWordBeforeSymbol(url) {
+      // Match the last word before any symbol (-, ., _, :)
+      const match = url.match(/(\w+)[:\-._]/);
+      return match ? match[1] : null;
+    }
+    const extractedHistName = extractWordBeforeSymbol(hostLink);
+
+    console.log("hostLink", hostLink);
+    const shortenedLink = `${extractedHistName}/${shortid.generate()}`;
+    // const shortenedLink = `${req.headers.host}/${shortid.generate()}`;
 
     // Create a new link document
     const newLink = new Links({
