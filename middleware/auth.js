@@ -1,19 +1,13 @@
-// This middleware will be used to protect routes that require authentication
-
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const authMiddleware = (req, res, next) => {
-  console.log("Auth middleware triggered");
-
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
     return res.status(401).json({ message: "This action is not allowed" });
   }
-
-  // const token = authHeader.split(" ")[1]; // Extract the token part
 
   try {
     const decoded = jwt.verify(authHeader, process.env.JWT_SECRET);

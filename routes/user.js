@@ -128,20 +128,6 @@ router.put("/edit", authMiddleware, async (req, res) => {
   }
 });
 
-// router.delete("/delete", authMiddleware, async (req, res) => {
-//   try {
-//     const userId = req.user.id; // Extract user ID from the authenticated token
-
-//     // Delete the user
-//     await User.findByIdAndDelete(userId);
-
-//     res.status(200).json({ message: "User deleted successfully" });
-//   } catch (error) {
-//     console.error("Error deleting user:", error.message);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// });
-
 router.delete("/delete", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id; // Extract user ID from the authenticated token
