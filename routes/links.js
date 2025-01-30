@@ -34,18 +34,18 @@ router.post("/create", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Original link is required" });
     }
 
-    // Generate a unique shortened link
-    const hostLink = `${req.headers.host}`;
-    function extractWordBeforeSymbol(url) {
-      // Match the last word before any symbol (-, ., _, :)
-      const match = url.match(/(\w+)[:\-._]/);
-      return match ? match[1] : null;
-    }
-    const extractedHistName = extractWordBeforeSymbol(hostLink);
+    // // Generate a unique shortened link
+    // const hostLink = `${req.headers.host}`;
+    // function extractWordBeforeSymbol(url) {
+    //   // Match the last word before any symbol (-, ., _, :)
+    //   const match = url.match(/(\w+)[:\-._]/);
+    //   return match ? match[1] : null;
+    // }
+    // const extractedHistName = extractWordBeforeSymbol(hostLink);
 
-    console.log("hostLink", hostLink);
-    const shortenedLink = `${extractedHistName}/${shortid.generate()}`;
-    // const shortenedLink = `${req.headers.host}/${shortid.generate()}`;
+    // console.log("hostLink", hostLink);
+    // const shortenedLink = `${extractedHistName}/${shortid.generate()}`;
+    const shortenedLink = `${req.headers.host}/${shortid.generate()}`;
 
     // Create a new link document
     const newLink = new Links({
