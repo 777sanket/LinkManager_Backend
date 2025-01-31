@@ -59,7 +59,7 @@ router.get("/all/links", authMiddleware, async (req, res) => {
     // Extract query parameters
     const {
       page = 1,
-      limit = 10,
+      limit = 50,
       sortBy = "dateClicked",
       order = "desc", // Default to recent first
     } = req.query;
@@ -124,7 +124,6 @@ router.get("/clicks/total-clicks", authMiddleware, async (req, res) => {
   }
 });
 
-//Date wise clicks
 router.get("/date/date-wise-clicks", authMiddleware, async (req, res) => {
   try {
     const todayUTC = new Date();
@@ -143,41 +142,40 @@ router.get("/date/date-wise-clicks", authMiddleware, async (req, res) => {
       return dateIST.toISOString().split("T")[0]; // Extract YYYY-MM-DD in IST
     });
 
-    // Apply JavaScript Logic for Grouping
     let dateCounts = clickData.reduce((acc, date) => {
       acc[date] = (acc[date] || 0) + 1;
       return acc;
     }, {});
 
-    // Convert dateCounts keys from `YYYY-MM-DD` → `DD-MM-YYYY`
-    const formattedDateCounts = Object.keys(dateCounts).reduce((acc, key) => {
-      const formattedKey = key.split("-").reverse().join("-"); // Convert YYYY-MM-DD to DD-MM-YYYY
-      acc[formattedKey] = dateCounts[key];
-      return acc;
-    }, {});
-
-    // Use dateCounts directly for clicksByDate
-    let clicksByDate = Object.entries(formattedDateCounts)
-      .map(([date, count]) => ({
-        _id: date, // Already in DD-MM-YYYY format
-        clicks: count,
+    let formattedDateCounts = Object.keys(dateCounts)
+      .map((key) => ({
+        _id: key.split("-").reverse().join("-"),
+        clicks: dateCounts[key],
       }))
       .sort(
         (a, b) =>
-          new Date(b._id.split("-").reverse().join("-")) -
-          new Date(a._id.split("-").reverse().join("-"))
-      ); // Sort descending
+          new Date(a._id.split("-").reverse().join("-")) -
+          new Date(b._id.split("-").reverse().join("-"))
+      );
 
-    // Remove dates with 0 clicks & keep only the most recent 4 dates
-    clicksByDate = clicksByDate.filter((entry) => entry.clicks > 0).slice(0, 4);
+    let cumulativeClicks = 0;
+    formattedDateCounts = formattedDateCounts.map((entry, index) => {
+      cumulativeClicks += entry.clicks;
+      return { _id: entry._id, clicks: cumulativeClicks };
+    });
+
+    formattedDateCounts.reverse();
+
+    formattedDateCounts = formattedDateCounts.slice(0, 4);
 
     res.status(200).json({
-      message: "Date-wise clicks retrieved successfully",
-      clicksByDate, // Now ordered correctly and filtered
-      // dateCounts: formattedDateCounts, // Retains full date counts (useful for debugging)
+      message: "Date-wise cumulative clicks retrieved successfully",
+      clicksByDate: formattedDateCounts, // ✅ Now contains cumulative clicks
+      dateCounts,
+      formattedDateCounts,
     });
   } catch (error) {
-    console.error("Error fetching date-wise clicks:", error.message);
+    console.error("Error fetching cumulative date-wise clicks:", error.message);
     res.status(500).json({ error: "Server error" });
   }
 });
