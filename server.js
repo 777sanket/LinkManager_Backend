@@ -14,7 +14,8 @@ connectDB();
 
 const corsOptions = {
   // origin: "http://localhost:5173",
-  origin: "https://srw-lm-sanket-wasniks-projects.vercel.app",
+  // origin: "https://srw-lm-sanket-wasniks-projects.vercel.app",
+  origin: "https://srw-lm.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 };
 
@@ -24,7 +25,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/user", userRoutes);
 app.use("/api/links", linkRoutes);
-// app.use("/api/analysis", analysisRoutes);
 app.use("/", analysisRoutes);
 
 app.listen(PORT, () => {
